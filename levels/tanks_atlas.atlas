@@ -1,0 +1,9 @@
+images {
+  image: "/images/tank.png"
+}
+images {
+  image: "/images/bg.png"
+}
+margin: 0
+extrude_borders: 0
+inner_padding: 0

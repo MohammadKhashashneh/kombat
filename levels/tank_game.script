@@ -1,0 +1,13 @@
+
+
+local p1_color = vmath.vector4(0.44, 0.44, 1, 1)
+local p2_color = vmath.vector4(0.78, 0.44, 0.76, 1)
+local field_color = vmath.vector4(0.37, 0.47, 0.1, 1)
+
+function init(self)
+	sprite.set_constant("/field#field", "tint", field_color)
+	sprite.set_constant("/p1#tank", "tint", p1_color)
+	sprite.set_constant("/p2#tank", "tint", p2_color)
+end
+
+
