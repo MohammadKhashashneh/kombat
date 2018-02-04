@@ -1,13 +1,51 @@
+-- tank_game.script: controls the tank game behaviour
+-- 2018 Mohammad Rasmi Khashashneh
 
-
+-- Player and field default colors
 local p1_color = vmath.vector4(0.44, 0.44, 1, 1)
 local p2_color = vmath.vector4(0.78, 0.44, 0.76, 1)
 local field_color = vmath.vector4(0.37, 0.47, 0.1, 1)
+-- P1 transformation variables
+local p1_movement = vmath.vector3()
+local p1_direction = 0
+-- Level constants
+local TANK_SPEED = 50				-- Default tank speed
+local ROTATION_ANGLE = 0.392699		-- Default tank rotation angle in radians (around 45 degrees)
+local P1 = "/p1"					-- P1 node path
 
 function init(self)
+	msg.post(".", "acquire_input_focus")
+	-- Initializing field and tank colors
 	sprite.set_constant("/field#field", "tint", field_color)
 	sprite.set_constant("/p1#tank", "tint", p1_color)
 	sprite.set_constant("/p2#tank", "tint", p2_color)
+	self.fcounter = 0
 end
 
+function update(self, dt)
+	local p1_rot = go.get_rotation(P1)
+	if p1_movement ~= 0 then
+		local pos = go.get_position(P1)
+		local velocity = p1_movement * TANK_SPEED * dt
+		local direction = vmath.quat_rotation_z(p1_direction)
+		pos = pos + vmath.rotate(direction, velocity)
+		go.set_position(pos, P1)
+		go.set_rotation(direction, P1)
+	end
+	p1_movement = vmath.vector3()
+end
 
+function on_input(self, action_id, action)
+
+	-- FIXME: tank movement pauses briefely
+	if(not action.repeated) then
+		return
+	end
+	if action_id == hash("forward") then
+		p1_movement.x = 1
+	elseif action_id == hash("rotate") then
+		p1_direction = p1_direction + ROTATION_ANGLE
+	elseif action_id == hash("rotate_counter") then
+		p1_direction = p1_direction - ROTATION_ANGLE
+	end
+end
