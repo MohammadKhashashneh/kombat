@@ -1,0 +1,39 @@
+
+-- Level constants
+local TANK_SPEED = 50				-- Default tank speed
+local ROTATION_ANGLE = 0.392699		-- Default tank rotation angle in radians (around 45 degrees)
+local fire = false
+-- TODO: can we define/include global variables?
+local MSG_FIRE = "fire"
+local MSG_FORWARD = "forward"
+local MSG_ROTATE = "rotate"
+local MSG_ROTATE_COUNTER = "rotate_counter"
+
+function init(self)
+	self.next_movement = vmath.vector3()
+	self.next_direction = 0
+end
+
+
+function update(self, dt)
+	local rotation = go.get_rotation()
+	if self.next_movement ~= 0 then
+		local pos = go.get_position()
+		local velocity = self.next_movement * TANK_SPEED * dt
+		local direction = vmath.quat_rotation_z(self.next_direction)
+		pos = pos + vmath.rotate(direction, velocity)
+		go.set_position(pos)
+		go.set_rotation(direction)
+	end
+	self.next_movement = vmath.vector3()
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash(MSG_FORWARD) then
+		self.next_movement.x = 1
+	elseif message_id == hash(MSG_ROTATE) then
+		self.next_direction = self.next_direction + ROTATION_ANGLE
+	elseif message_id == hash(MSG_ROTATE_COUNTER) then
+		self.next_direction = self.next_direction - ROTATION_ANGLE
+	end
+end

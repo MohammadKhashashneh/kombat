@@ -1,18 +1,50 @@
 key_trigger {
   input: KEY_UP
-  action: "forward"
+  action: "p1_forward"
 }
 key_trigger {
   input: KEY_LEFT
-  action: "rotate"
+  action: "p1_rotate"
 }
 key_trigger {
   input: KEY_RIGHT
-  action: "rotate_counter"
+  action: "p1_rotate_counter"
 }
 key_trigger {
   input: KEY_SPACE
-  action: "fire"
+  action: "p1_fire"
+}
+key_trigger {
+  input: KEY_KP_8
+  action: "p2_forward"
+}
+key_trigger {
+  input: KEY_KP_4
+  action: "p2_rotate"
+}
+key_trigger {
+  input: KEY_KP_6
+  action: "p2_rotate_counter"
+}
+key_trigger {
+  input: KEY_RCTRL
+  action: "p2_fire"
+}
+key_trigger {
+  input: KEY_W
+  action: "p1_forward"
+}
+key_trigger {
+  input: KEY_A
+  action: "p1_rotate"
+}
+key_trigger {
+  input: KEY_D
+  action: "p1_rotate_counter"
+}
+key_trigger {
+  input: KEY_LCTRL
+  action: "p1_fire"
 }
 gamepad_trigger {
   input: GAMEPAD_LPAD_UP
