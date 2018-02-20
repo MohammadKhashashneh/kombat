@@ -1,0 +1,20 @@
+local SPEED = vmath.vector3(150, 0, 0)
+local GAME_WIDTH = 223
+local GAME_HEIGHT = 176
+local BULLET_RANGE = 170
+
+function init(self)
+	self.spawn_pos = go.get_position()
+end
+
+function update(self, dt)
+	local pos = go.get_position()
+	if pos.x > GAME_WIDTH or pos.x < 0 or pos.y > GAME_HEIGHT or pos.y < 0 then
+		go.delete()
+	elseif vmath.length(pos - self.spawn_pos) >= BULLET_RANGE then
+		go.delete()
+	else
+		local pos = go.get_position() + vmath.rotate(go.get_rotation(), SPEED * dt)
+		go.set_position(pos)
+	end
+end

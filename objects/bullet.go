@@ -1,6 +1,6 @@
 components {
-  id: "tank1"
-  component: "/objects/tank.script"
+  id: "bullet"
+  component: "/objects/bullet.script"
   position {
     x: 0.0
     y: 0.0
@@ -14,10 +14,10 @@ components {
   }
 }
 embedded_components {
-  id: "tank"
+  id: "sprite"
   type: "sprite"
   data: "tile_set: \"/levels/tanks_atlas.atlas\"\n"
-  "default_animation: \"tank\"\n"
+  "default_animation: \"bullet\"\n"
   "material: \"/builtins/materials/sprite.material\"\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
   ""
@@ -41,8 +41,8 @@ embedded_components {
   "mass: 0.0\n"
   "friction: 0.1\n"
   "restitution: 0.5\n"
-  "group: \"tanks\"\n"
-  "mask: \"bullets\"\n"
+  "group: \"bullets\"\n"
+  "mask: \"tanks\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
   "    shape_type: TYPE_BOX\n"
@@ -60,9 +60,9 @@ embedded_components {
   "    index: 0\n"
   "    count: 3\n"
   "  }\n"
-  "  data: 6.0\n"
-  "  data: 6.0\n"
-  "  data: 6.0\n"
+  "  data: 1.0\n"
+  "  data: 1.0\n"
+  "  data: 1.0\n"
   "}\n"
   "linear_damping: 0.0\n"
   "angular_damping: 0.0\n"

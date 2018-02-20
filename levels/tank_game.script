@@ -2,13 +2,14 @@
 -- 2018 Mohammad Rasmi Khashashneh
 
 -- Player and field default colors
-local p1_color = vmath.vector4(0.44, 0.44, 1, 1)
-local p2_color = vmath.vector4(0.78, 0.44, 0.76, 1)
-local field_color = vmath.vector4(0.37, 0.47, 0.1, 1)
+local P1_COLOR = vmath.vector4(0.44, 0.44, 1, 1)
+local P2_COLOR = vmath.vector4(0.78, 0.44, 0.76, 1)
+local FIELD_COLOR = vmath.vector4(0.37, 0.47, 0.1, 1)
 local P1 = "/p1"					-- P1 node path
 local P2 = "/p2"					-- P2 node path
-
-
+local FIELD = "field"
+local TANK_SPRITE = "#tank"
+local FIELD_SPRITE = "#field"
 -- TODO: can we define/include global variables?
 local MSG_FIRE = "fire"
 local MSG_FORWARD = "forward"
@@ -16,19 +17,31 @@ local MSG_ROTATE = "rotate"
 local MSG_ROTATE_COUNTER = "rotate_counter"
 local P1_CNTRL_PREFIX = "p1_"
 local P2_CNTRL_PREFIX = "p2_"
+local BULLET_FACTORY = "/tank_level#bullet_factory"
+local BULLET_SPAWN_OFFSET = vmath.vector3(8, 0, 0)
+
+local colors = {[FIELD..FIELD_SPRITE] = FIELD_COLOR, [P1..TANK_SPRITE] = P1_COLOR, [P2..TANK_SPRITE] = P2_COLOR}
+local bullets = {}
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
 	-- Initializing field and tank colors
-	sprite.set_constant("/field#field", "tint", field_color)
-	sprite.set_constant("/p1#tank", "tint", p1_color)
-	sprite.set_constant("/p2#tank", "tint", p2_color)
+	sprite.set_constant("/field#field", "tint", FIELD_COLOR)
+	sprite.set_constant("/p1#tank", "tint", P1_COLOR)
+	sprite.set_constant("/p2#tank", "tint", P2_COLOR)
+end
+
+function fire_bullet(player)
+	-- if bullets[player] then
+	--	return
+	--end
+	local id = factory.create(BULLET_FACTORY, go.get_position(player) + BULLET_SPAWN_OFFSET, go.get_rotation(player))
+	sprite.set_constant(id, 'tint', colors[player..TANK_SPRITE])
 end
 
 function check_input(action_id, player, prefix)
-	print(action_id, player, prefix)
 	if action_id == hash(prefix .. MSG_FIRE) then
-		msg.post(player, MSG_FIRE)
+		fire_bullet(player)
 	elseif action_id == hash(prefix .. MSG_FORWARD) then
 		msg.post(player, MSG_FORWARD)
 	elseif action_id == hash(prefix .. MSG_ROTATE) then
@@ -45,5 +58,4 @@ function on_input(self, action_id, action)
 	end
 	check_input(action_id, P1, P1_CNTRL_PREFIX)
 	check_input(action_id, P2, P2_CNTRL_PREFIX)
-
 end

@@ -2,23 +2,35 @@
 -- Level constants
 local TANK_SPEED = 50				-- Default tank speed
 local ROTATION_ANGLE = 0.392699		-- Default tank rotation angle in radians (around 45 degrees)
-local fire = false
 -- TODO: can we define/include global variables?
-local MSG_FIRE = "fire"
 local MSG_FORWARD = "forward"
 local MSG_ROTATE = "rotate"
 local MSG_ROTATE_COUNTER = "rotate_counter"
+local DEATH_ROTATION_ANGLE = ROTATION_ANGLE * 1.7
+local DEATH_ANIMATION_TIMEOUT = 1.5
 
 function init(self)
 	self.next_movement = vmath.vector3()
 	self.next_direction = 0
+	self.bullet = nil
+	self.death_timer = 0
+	self.hit = false
 end
 
-
 function update(self, dt)
-	local rotation = go.get_rotation()
+	if self.hit then
+		if self.death_timer >= DEATH_ANIMATION_TIMEOUT then
+			self.hit = false
+		else
+			self.next_direction = (DEATH_ROTATION_ANGLE) + self.next_direction
+			local direction = vmath.quat_rotation_z(self.next_direction)
+			go.set_rotation(direction)
+			self.death_timer = self.death_timer + dt
+		end
+		return
+	end
+	local pos = go.get_position()
 	if self.next_movement ~= 0 then
-		local pos = go.get_position()
 		local velocity = self.next_movement * TANK_SPEED * dt
 		local direction = vmath.quat_rotation_z(self.next_direction)
 		pos = pos + vmath.rotate(direction, velocity)
@@ -35,5 +47,9 @@ function on_message(self, message_id, message)
 		self.next_direction = self.next_direction + ROTATION_ANGLE
 	elseif message_id == hash(MSG_ROTATE_COUNTER) then
 		self.next_direction = self.next_direction - ROTATION_ANGLE
+	end
+	if message_id == hash("collision_response") then
+		go.delete(message.other_id)
+		self.hit = true
 	end
 end
