@@ -15,11 +15,12 @@ local MSG_FIRE = "fire"
 local MSG_FORWARD = "forward"
 local MSG_ROTATE = "rotate"
 local MSG_ROTATE_COUNTER = "rotate_counter"
+local MSG_IS_HIT = "is_hit"
+local MSG_SET_LEVEL = "set_level"
 local P1_CNTRL_PREFIX = "p1_"
 local P2_CNTRL_PREFIX = "p2_"
 local BULLET_FACTORY = "/tank_level#bullet_factory"
 local BULLET_SPAWN_OFFSET = vmath.vector3(8, 0, 0)
-
 local colors = {[FIELD..FIELD_SPRITE] = FIELD_COLOR, [P1..TANK_SPRITE] = P1_COLOR, [P2..TANK_SPRITE] = P2_COLOR}
 local bullets = {}
 
@@ -29,13 +30,17 @@ function init(self)
 	sprite.set_constant("/field#field", "tint", FIELD_COLOR)
 	sprite.set_constant("/p1#tank", "tint", P1_COLOR)
 	sprite.set_constant("/p2#tank", "tint", P2_COLOR)
+	msg.post(P1, MSG_SET_LEVEL, {level = go.get_id(), player = P1})
+	msg.post(P2, MSG_SET_LEVEL, {level = go.get_id(), player = P2})
+	self.p1_score = 0
+	self.p2_score = 0
 end
 
 function fire_bullet(player)
 	-- if bullets[player] then
 	--	return
 	--end
-	local id = factory.create(BULLET_FACTORY, go.get_position(player) + BULLET_SPAWN_OFFSET, go.get_rotation(player))
+	local id = factory.create(BULLET_FACTORY, go.get_position(player) + vmath.rotate(go.get_rotation(player), BULLET_SPAWN_OFFSET), go.get_rotation(player))
 	sprite.set_constant(id, 'tint', colors[player..TANK_SPRITE])
 end
 
@@ -58,4 +63,15 @@ function on_input(self, action_id, action)
 	end
 	check_input(action_id, P1, P1_CNTRL_PREFIX)
 	check_input(action_id, P2, P2_CNTRL_PREFIX)
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash(MSG_IS_HIT) then
+		if message.player == P1 then
+			self.p2_score = self.p2_score + 1
+		elseif message.player == P2 then
+			self.p1_score = self.p1_score + 1
+		end
+		print("p1 is ", self.p1_score, ", p2 is ", self.p2_score)
+	end
 end

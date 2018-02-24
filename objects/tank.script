@@ -6,12 +6,15 @@ local ROTATION_ANGLE = 0.392699		-- Default tank rotation angle in radians (arou
 local MSG_FORWARD = "forward"
 local MSG_ROTATE = "rotate"
 local MSG_ROTATE_COUNTER = "rotate_counter"
+local MSG_IS_HIT = "is_hit"
+local MSG_SET_LEVEL = "set_level"
+local MSG_COLLISION_RESPONSE = "collision_response"
 local DEATH_ROTATION_ANGLE = ROTATION_ANGLE * 1.7
 local DEATH_ANIMATION_TIMEOUT = 1.5
 
+
 function init(self)
 	self.next_movement = vmath.vector3()
-	self.next_direction = 0
 	self.bullet = nil
 	self.death_timer = 0
 	self.hit = false
@@ -21,7 +24,11 @@ function update(self, dt)
 	if self.hit then
 		if self.death_timer >= DEATH_ANIMATION_TIMEOUT then
 			self.hit = false
+			self.death_timer = 0
 		else
+			if self.next_direction == nil then
+				self.next_direction = 0
+			end
 			self.next_direction = (DEATH_ROTATION_ANGLE) + self.next_direction
 			local direction = vmath.quat_rotation_z(self.next_direction)
 			go.set_rotation(direction)
@@ -32,10 +39,15 @@ function update(self, dt)
 	local pos = go.get_position()
 	if self.next_movement ~= 0 then
 		local velocity = self.next_movement * TANK_SPEED * dt
-		local direction = vmath.quat_rotation_z(self.next_direction)
-		pos = pos + vmath.rotate(direction, velocity)
+		if self.next_direction ~= nil then
+			local direction = vmath.quat_rotation_z(self.next_direction)
+			pos = pos + vmath.rotate(direction, velocity)
+			go.set_rotation(direction)
+		else
+			pos = pos + velocity
+		end
 		go.set_position(pos)
-		go.set_rotation(direction)
+		
 	end
 	self.next_movement = vmath.vector3()
 end
@@ -44,12 +56,21 @@ function on_message(self, message_id, message)
 	if message_id == hash(MSG_FORWARD) then
 		self.next_movement.x = 1
 	elseif message_id == hash(MSG_ROTATE) then
+		if self.next_direction == nil then
+			self.next_direction = 0
+		end
 		self.next_direction = self.next_direction + ROTATION_ANGLE
 	elseif message_id == hash(MSG_ROTATE_COUNTER) then
 		self.next_direction = self.next_direction - ROTATION_ANGLE
 	end
-	if message_id == hash("collision_response") then
+	if message_id == hash(MSG_COLLISION_RESPONSE) then -- with bullet
 		go.delete(message.other_id)
-		self.hit = true
+		if not self.hit then
+			self.hit = true
+			msg.post(self.level, MSG_IS_HIT, {player = self.player})
+		end
+	elseif message_id == hash(MSG_SET_LEVEL) then
+		self.level = message.level
+		self.player = message.player
 	end
 end
