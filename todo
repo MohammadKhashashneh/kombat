@@ -1,0 +1,9 @@
+- tank game sound effects
+- tank level obstacles and borders
+- score display
+- basic game workflow: demo, game start and match timer, mode selection
+- dog fight game implementation
+- jet plane game implementation
+- basic online support
+- basic matchmaking
+- loby and other features
