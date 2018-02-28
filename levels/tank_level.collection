@@ -1,10 +1,12 @@
 name: "default"
 instances {
-  id: "field"
-  prototype: "/levels/field.go"
+  id: "tank_level1"
+  prototype: "/levels/tank_level.go"
+  children: "p1"
+  children: "p2"
   position {
-    x: 112.0
-    y: 89.0
+    x: 0.0
+    y: 0.0
     z: 0.0
   }
   rotation {
@@ -23,9 +25,9 @@ instances {
   id: "p1"
   prototype: "/objects/tank.go"
   position {
-    x: 30.0
-    y: 79.0
-    z: 0.1
+    x: 33.0
+    y: 87.0
+    z: 0.3
   }
   rotation {
     x: 0.0
@@ -43,9 +45,9 @@ instances {
   id: "p2"
   prototype: "/objects/tank.go"
   position {
-    x: 176.0
-    y: 83.0
-    z: 0.1
+    x: 192.0
+    y: 87.0
+    z: 0.3
   }
   rotation {
     x: 0.0
@@ -60,59 +62,3 @@ instances {
   }
 }
 scale_along_z: 0
-embedded_instances {
-  id: "tank_level"
-  children: "field"
-  children: "p1"
-  children: "p2"
-  data: "components {\n"
-  "  id: \"tank_game\"\n"
-  "  component: \"/levels/tank_game.script\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  "embedded_components {\n"
-  "  id: \"bullet_factory\"\n"
-  "  type: \"factory\"\n"
-  "  data: \"prototype: \\\"/objects/bullet.go\\\"\\n"
-  "load_dynamically: false\\n"
-  "\"\n"
-  "  position {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "  }\n"
-  "  rotation {\n"
-  "    x: 0.0\n"
-  "    y: 0.0\n"
-  "    z: 0.0\n"
-  "    w: 1.0\n"
-  "  }\n"
-  "}\n"
-  ""
-  position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}

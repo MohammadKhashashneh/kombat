@@ -42,6 +42,7 @@ embedded_components {
   "friction: 0.1\n"
   "restitution: 0.5\n"
   "group: \"tanks\"\n"
+  "mask: \"level\"\n"
   "mask: \"bullets\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"

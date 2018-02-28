@@ -22,23 +22,37 @@
 
 -- Level constants
 local TANK_SPEED = 50				-- Default tank speed
-local ROTATION_ANGLE = 0.392699		-- Default tank rotation angle in radians (around 45 degrees)
+local ROTATION_ANGLE = math.pi/8 -- Default tank rotation angle in radians (45 degrees)
+local ROTATION_ANGLE_180 = math.pi  -- Default tank rotation angle in radians (180 degrees). used in initialization
+local DEATH_ROTATION_ANGLE = ROTATION_ANGLE * 2 -- Rotation 
+local DEATH_ANIMATION_TIMEOUT = 1.5
 -- TODO: can we define/include global variables?
+-- Message constants
 local MSG_FORWARD = "forward"
 local MSG_ROTATE = "rotate"
 local MSG_ROTATE_COUNTER = "rotate_counter"
 local MSG_IS_HIT = "is_hit"
 local MSG_SET_LEVEL = "set_level"
 local MSG_COLLISION_RESPONSE = "collision_response"
-local DEATH_ROTATION_ANGLE = ROTATION_ANGLE * 1.7
-local DEATH_ANIMATION_TIMEOUT = 1.5
 
+
+go.property("level", hash(""))
+go.property("color", vmath.vector4())
 
 function init(self)
 	self.next_movement = vmath.vector3()
 	self.bullet = nil
 	self.death_timer = 0
 	self.hit = false
+	self.next_direction = 0
+	local rot = go.get_rotation()
+	local m = vmath.matrix4_from_quat(rot)
+	if m.m00 == -1 then
+		self.next_direction = ROTATION_ANGLE_180
+	else
+		self.next_direction = math.asin(m.m01) * -1
+	end
+	--print(go.get_id(), "\nrotation = ", go.get_rotation(), "\nmatrix = ", m, "\ncos0 = ", m.m00, "\nsin0 = ", m.m01, "\nnext_direction = ", self.next_direction)
 end
 
 function update(self, dt)
@@ -47,9 +61,6 @@ function update(self, dt)
 			self.hit = false
 			self.death_timer = 0
 		else
-			if self.next_direction == nil then
-				self.next_direction = 0
-			end
 			self.next_direction = (DEATH_ROTATION_ANGLE) + self.next_direction
 			local direction = vmath.quat_rotation_z(self.next_direction)
 			go.set_rotation(direction)
@@ -60,38 +71,35 @@ function update(self, dt)
 	local pos = go.get_position()
 	if self.next_movement ~= 0 then
 		local velocity = self.next_movement * TANK_SPEED * dt
-		if self.next_direction ~= nil then
-			local direction = vmath.quat_rotation_z(self.next_direction)
+		--if self.next_direction ~= 0 then
+			local direction = vmath.quat_rotation_z(self.next_direction)--self.next_direction
 			pos = pos + vmath.rotate(direction, velocity)
 			go.set_rotation(direction)
-		else
-			pos = pos + velocity
-		end
+		--else
+			--pos = pos + velocity
+		--end
 		go.set_position(pos)
-		
 	end
 	self.next_movement = vmath.vector3()
 end
 
 function on_message(self, message_id, message)
+	--if self.next_direction == nil then
+		--self.next_direction = 0
+	--end
 	if message_id == hash(MSG_FORWARD) then
 		self.next_movement.x = 1
 	elseif message_id == hash(MSG_ROTATE) then
-		if self.next_direction == nil then
-			self.next_direction = 0
-		end
 		self.next_direction = self.next_direction + ROTATION_ANGLE
 	elseif message_id == hash(MSG_ROTATE_COUNTER) then
 		self.next_direction = self.next_direction - ROTATION_ANGLE
 	end
-	if message_id == hash(MSG_COLLISION_RESPONSE) then -- with bullet
-		go.delete(message.other_id)
-		if not self.hit then
+	if message_id == hash(MSG_COLLISION_RESPONSE) then
+		if message.other_id == self.level then
+			self.next_movement.x = -1
+		elseif not self.hit then
 			self.hit = true
-			msg.post(self.level, MSG_IS_HIT, {player = self.player})
+			msg.post(self.level, MSG_IS_HIT, {player = go.get_id()})
 		end
-	elseif message_id == hash(MSG_SET_LEVEL) then
-		self.level = message.level
-		self.player = message.player
 	end
 end

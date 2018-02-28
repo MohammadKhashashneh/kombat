@@ -24,6 +24,11 @@ local SPEED = vmath.vector3(150, 0, 0)
 local GAME_WIDTH = 223
 local GAME_HEIGHT = 176
 local BULLET_RANGE = 170
+local MSG_COLLISION_RESPONSE = "collision_response"
+local MSG_BULLET_PLAYER_HIT = "bullet_player_hit"
+
+go.property("pong", false)
+go.property("level", hash(""))
 
 function init(self)
 	self.spawn_pos = go.get_position()
@@ -38,5 +43,25 @@ function update(self, dt)
 	else
 		local pos = go.get_position() + vmath.rotate(go.get_rotation(), SPEED * dt)
 		go.set_position(pos)
+	end
+end
+
+function rebound()
+	-- TODO: implement me
+	print("booo, not implemented yet")
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash(MSG_COLLISION_RESPONSE) then -- with bullet
+		if message.other_id ~= self.level then
+			--msg.post(self.level, MSG_BULLET_PLAYER_HIT, {player = message.other_id})
+			go.delete()
+		elseif self.pong then
+			rebound()
+		else
+			print(go.get_position())
+			go.delete()
+			
+		end
 	end
 end

@@ -7,6 +7,9 @@ images {
 images {
   image: "/images/bullet.png"
 }
+images {
+  image: "/images/tank_level.png"
+}
 margin: 0
 extrude_borders: 0
 inner_padding: 0

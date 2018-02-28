@@ -21,46 +21,54 @@
 --SOFTWARE.
 
 -- Player and field default colors
-local P1_COLOR = vmath.vector4(0.44, 0.44, 1, 1)
-local P2_COLOR = vmath.vector4(0.78, 0.44, 0.76, 1)
-local FIELD_COLOR = vmath.vector4(0.37, 0.47, 0.1, 1)
-local P1 = "/p1"					-- P1 node path
-local P2 = "/p2"					-- P2 node path
-local FIELD = "field"
-local TANK_SPRITE = "#tank"
-local FIELD_SPRITE = "#field"
+local COLOR_P1 = vmath.vector4(0.44, 0.44, 1, 1)
+local COLOR_P2 = vmath.vector4(0.78, 0.44, 0.76, 1)
+local COLOR_FIELD = vmath.vector4(0.37, 0.47, 0.1, 1)
+local COLOR_OBSTACLES = vmath.vector4(0.95, 0.76, 0.50, 1)
+local P1 = "/p1"					-- P1 component path
+local P2 = "/p2"					-- P2 component path
+local LEVEL = "/tank_level"			-- level component path
+local FIELD = "#field"				-- field component path
+local BORDERS = "#borders"			-- borders component path
+--local FIELD = "field"
+--local SPRITE_P1_TANK = P1.."#tank"
+--local SPRITE_P2_TANK = P2.."#tank"
+--local SPRITE_FIELD = "#field"
 -- TODO: can we define/include global variables?
 local MSG_FIRE = "fire"
 local MSG_FORWARD = "forward"
 local MSG_ROTATE = "rotate"
 local MSG_ROTATE_COUNTER = "rotate_counter"
 local MSG_IS_HIT = "is_hit"
-local MSG_SET_LEVEL = "set_level"
+--local MSG_SET_LEVEL = "set_level"
 local P1_CNTRL_PREFIX = "p1_"
 local P2_CNTRL_PREFIX = "p2_"
-local BULLET_FACTORY = "/tank_level#bullet_factory"
+local BULLET_FACTORY = "#bullet_factory"
 local BULLET_SPAWN_OFFSET = vmath.vector3(8, 0, 0)
-local colors = {[FIELD..FIELD_SPRITE] = FIELD_COLOR, [P1..TANK_SPRITE] = P1_COLOR, [P2..TANK_SPRITE] = P2_COLOR}
-local bullets = {}
+local MSG_BULLET_PLAYER_HIT = "bullet_player_hit"
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
 	-- Initializing field and tank colors
-	sprite.set_constant("/field#field", "tint", FIELD_COLOR)
-	sprite.set_constant("/p1#tank", "tint", P1_COLOR)
-	sprite.set_constant("/p2#tank", "tint", P2_COLOR)
-	msg.post(P1, MSG_SET_LEVEL, {level = go.get_id(), player = P1})
-	msg.post(P2, MSG_SET_LEVEL, {level = go.get_id(), player = P2})
+	-- TODO: use go properties instead
+	sprite.set_constant(FIELD, "tint", COLOR_FIELD)
+	sprite.set_constant("/p1#tank", "tint", COLOR_P1)
+	sprite.set_constant("/p2#tank", "tint", COLOR_P2)
+	sprite.set_constant(BORDERS, "tint", COLOR_OBSTACLES)
+	go.set("/p1#tank1", "level", go.get_id())
+	go.set("/p2#tank1", "level", go.get_id())
+	go.set("/p1#tank1", "color", COLOR_P1)
+	go.set("/p2#tank1", "color", COLOR_P2)
 	self.p1_score = 0
 	self.p2_score = 0
 end
 
 function fire_bullet(player)
-	-- if bullets[player] then
-	--	return
-	--end
-	local id = factory.create(BULLET_FACTORY, go.get_position(player) + vmath.rotate(go.get_rotation(player), BULLET_SPAWN_OFFSET), go.get_rotation(player))
-	sprite.set_constant(id, 'tint', colors[player..TANK_SPRITE])
+	local rot = go.get_rotation(player)
+	local pos = go.get_position(player) + vmath.rotate(rot, BULLET_SPAWN_OFFSET)
+	pos.z = 0.3
+	local id = factory.create(BULLET_FACTORY, pos, rot, {pong = false, level = go.get_id()})
+	sprite.set_constant(id, "tint", go.get(player.."#tank1", "color")) --colors[player..TANK_SPRITE]
 end
 
 function check_input(action_id, player, prefix)
@@ -86,9 +94,9 @@ end
 
 function on_message(self, message_id, message)
 	if message_id == hash(MSG_IS_HIT) then
-		if message.player == P1 then
+		if message.player == hash(P1) then
 			self.p2_score = self.p2_score + 1
-		elseif message.player == P2 then
+		elseif message.player == hash(P2) then
 			self.p1_score = self.p1_score + 1
 		end
 		print("p1 is ", self.p1_score, ", p2 is ", self.p2_score)

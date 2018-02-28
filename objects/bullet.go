@@ -24,7 +24,7 @@ embedded_components {
   position {
     x: 0.0
     y: 0.0
-    z: 0.0
+    z: 0.3
   }
   rotation {
     x: 0.0
@@ -42,6 +42,7 @@ embedded_components {
   "friction: 0.1\n"
   "restitution: 0.5\n"
   "group: \"bullets\"\n"
+  "mask: \"level\"\n"
   "mask: \"tanks\"\n"
   "embedded_collision_shape {\n"
   "  shapes {\n"
