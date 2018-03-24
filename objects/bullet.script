@@ -59,7 +59,6 @@ function on_message(self, message_id, message)
 		elseif self.pong then
 			rebound()
 		else
-			print(go.get_position())
 			go.delete()
 			
 		end

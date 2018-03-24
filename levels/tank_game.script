@@ -92,13 +92,22 @@ function on_input(self, action_id, action)
 	check_input(action_id, P2, P2_CNTRL_PREFIX)
 end
 
+function update_scores(score_prefix, score)
+	local tens = math.floor(score * 0.1)
+	local ones = score - (tens * 10)
+	print(tens, ones)
+	msg.post(score_prefix.."tens", "play_animation", {id = hash("num_0"..tens)})
+	msg.post(score_prefix.."ones", "play_animation", {id = hash("num_0"..ones)})
+end
+
 function on_message(self, message_id, message)
 	if message_id == hash(MSG_IS_HIT) then
 		if message.player == hash(P1) then
 			self.p2_score = self.p2_score + 1
+			update_scores("#p2_", self.p2_score)
 		elseif message.player == hash(P2) then
 			self.p1_score = self.p1_score + 1
+			update_scores("#p1_", self.p1_score)
 		end
-		print("p1 is ", self.p1_score, ", p2 is ", self.p2_score)
 	end
 end

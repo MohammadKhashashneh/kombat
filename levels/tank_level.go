@@ -65,7 +65,7 @@ embedded_components {
   "    shape_type: TYPE_BOX\n"
   "    position {\n"
   "      x: 219.0\n"
-  "      y: 88.0\n"
+  "      y: 82.0\n"
   "      z: 0.0\n"
   "    }\n"
   "    rotation {\n"
@@ -113,7 +113,7 @@ embedded_components {
   "  data: 76.0\n"
   "  data: 10.0\n"
   "  data: 3.0\n"
-  "  data: 82.0\n"
+  "  data: 76.0\n"
   "  data: 10.0\n"
   "  data: 111.0\n"
   "  data: 3.0\n"
@@ -168,6 +168,86 @@ embedded_components {
     x: 0.0
     y: 0.0
     z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "p1_tens"
+  type: "sprite"
+  data: "tile_set: \"/levels/tanks_atlas.atlas\"\n"
+  "default_animation: \"num_00\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "blend_mode: BLEND_MODE_ALPHA\n"
+  ""
+  position {
+    x: 46.0
+    y: 169.0
+    z: 0.4
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "p1_ones"
+  type: "sprite"
+  data: "tile_set: \"/levels/tanks_atlas.atlas\"\n"
+  "default_animation: \"num_00\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "blend_mode: BLEND_MODE_ALPHA\n"
+  ""
+  position {
+    x: 63.0
+    y: 169.0
+    z: 0.4
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "p2_tens"
+  type: "sprite"
+  data: "tile_set: \"/levels/tanks_atlas.atlas\"\n"
+  "default_animation: \"num_00\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "blend_mode: BLEND_MODE_ALPHA\n"
+  ""
+  position {
+    x: 156.0
+    y: 169.0
+    z: 0.4
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "p2_ones"
+  type: "sprite"
+  data: "tile_set: \"/levels/tanks_atlas.atlas\"\n"
+  "default_animation: \"num_00\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "blend_mode: BLEND_MODE_ALPHA\n"
+  ""
+  position {
+    x: 173.0
+    y: 169.0
+    z: 0.4
   }
   rotation {
     x: 0.0

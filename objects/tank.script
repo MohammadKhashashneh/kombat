@@ -52,7 +52,6 @@ function init(self)
 	else
 		self.next_direction = math.asin(m.m01) * -1
 	end
-	--print(go.get_id(), "\nrotation = ", go.get_rotation(), "\nmatrix = ", m, "\ncos0 = ", m.m00, "\nsin0 = ", m.m01, "\nnext_direction = ", self.next_direction)
 end
 
 function update(self, dt)

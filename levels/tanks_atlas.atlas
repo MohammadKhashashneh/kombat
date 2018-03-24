@@ -10,6 +10,36 @@ images {
 images {
   image: "/images/tank_level.png"
 }
+images {
+  image: "/images/num_00.png"
+}
+images {
+  image: "/images/num_05.png"
+}
+images {
+  image: "/images/num_02.png"
+}
+images {
+  image: "/images/num_01.png"
+}
+images {
+  image: "/images/num_06.png"
+}
+images {
+  image: "/images/num_09.png"
+}
+images {
+  image: "/images/num_07.png"
+}
+images {
+  image: "/images/num_08.png"
+}
+images {
+  image: "/images/num_04.png"
+}
+images {
+  image: "/images/num_03.png"
+}
 margin: 0
 extrude_borders: 0
 inner_padding: 0
