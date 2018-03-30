@@ -1,44 +1,44 @@
 images {
-  image: "/images/tank.png"
+  image: "/levels/images/tank.png"
 }
 images {
-  image: "/images/bg.png"
+  image: "/levels/images/bg.png"
 }
 images {
-  image: "/images/bullet.png"
+  image: "/levels/images/bullet.png"
 }
 images {
-  image: "/images/tank_level.png"
+  image: "/levels/images/tank_level.png"
 }
 images {
-  image: "/images/num_00.png"
+  image: "/levels/images/num_00.png"
 }
 images {
-  image: "/images/num_05.png"
+  image: "/levels/images/num_05.png"
 }
 images {
-  image: "/images/num_02.png"
+  image: "/levels/images/num_02.png"
 }
 images {
-  image: "/images/num_01.png"
+  image: "/levels/images/num_01.png"
 }
 images {
-  image: "/images/num_06.png"
+  image: "/levels/images/num_06.png"
 }
 images {
-  image: "/images/num_09.png"
+  image: "/levels/images/num_09.png"
 }
 images {
-  image: "/images/num_07.png"
+  image: "/levels/images/num_07.png"
 }
 images {
-  image: "/images/num_08.png"
+  image: "/levels/images/num_08.png"
 }
 images {
-  image: "/images/num_04.png"
+  image: "/levels/images/num_04.png"
 }
 images {
-  image: "/images/num_03.png"
+  image: "/levels/images/num_03.png"
 }
 margin: 0
 extrude_borders: 0

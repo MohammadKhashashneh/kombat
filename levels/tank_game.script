@@ -39,6 +39,7 @@ local MSG_FIRE = "fire"
 local MSG_FORWARD = "forward"
 local MSG_ROTATE = "rotate"
 local MSG_ROTATE_COUNTER = "rotate_counter"
+local MSG_START = "start"
 local MSG_IS_HIT = "is_hit"
 --local MSG_SET_LEVEL = "set_level"
 local P1_CNTRL_PREFIX = "p1_"
@@ -46,21 +47,59 @@ local P2_CNTRL_PREFIX = "p2_"
 local BULLET_FACTORY = "#bullet_factory"
 local BULLET_SPAWN_OFFSET = vmath.vector3(8, 0, 0)
 local MSG_BULLET_PLAYER_HIT = "bullet_player_hit"
+local demo = true
+local DEMO_TIMEOUT = 3
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
 	-- Initializing field and tank colors
 	-- TODO: use go properties instead
-	sprite.set_constant(FIELD, "tint", COLOR_FIELD)
-	sprite.set_constant("/p1#tank", "tint", COLOR_P1)
-	sprite.set_constant("/p2#tank", "tint", COLOR_P2)
-	sprite.set_constant(BORDERS, "tint", COLOR_OBSTACLES)
 	go.set("/p1#tank1", "level", go.get_id())
 	go.set("/p2#tank1", "level", go.get_id())
 	go.set("/p1#tank1", "color", COLOR_P1)
 	go.set("/p2#tank1", "color", COLOR_P2)
 	self.p1_score = 0
 	self.p2_score = 0
+	self.demo_timer = DEMO_TIMEOUT
+end
+
+function get_random_color(base)
+	local col = vmath.vector4(base)
+	col.x = math.random()
+--	col.y = math.random()
+	col.z = math.random()
+	return col
+end
+
+function init_colors()
+	sprite.set_constant(FIELD, "tint", COLOR_FIELD)
+	sprite.set_constant("/p1#tank", "tint", COLOR_P1)
+	sprite.set_constant("#p1_tens", "tint", COLOR_P1)
+	sprite.set_constant("#p1_ones", "tint", COLOR_P1)
+	sprite.set_constant("/p2#tank", "tint", COLOR_P2)
+	sprite.set_constant("#p2_tens", "tint", COLOR_P2)
+	sprite.set_constant("#p2_ones", "tint", COLOR_P2)
+	sprite.set_constant(BORDERS, "tint", COLOR_OBSTACLES)
+end
+
+function update(self, dt)
+	if demo then
+		local col
+		self.demo_timer = self.demo_timer + dt
+		if(self.demo_timer > DEMO_TIMEOUT) then
+			self.demo_timer = 0
+			sprite.set_constant(FIELD, "tint", get_random_color(COLOR_FIELD))
+			col = get_random_color(COLOR_P1)
+			sprite.set_constant("/p1#tank", "tint", col)
+			sprite.set_constant("#p1_tens", "tint", col)
+			sprite.set_constant("#p1_ones", "tint", col)
+			col = get_random_color(COLOR_P2)
+			sprite.set_constant("/p2#tank", "tint", col)
+			sprite.set_constant("#p2_tens", "tint", col)
+			sprite.set_constant("#p2_ones", "tint", col)
+			sprite.set_constant(BORDERS, "tint", get_random_color(COLOR_OBSTACLES))
+		end	
+	end
 end
 
 function fire_bullet(player)
@@ -69,6 +108,14 @@ function fire_bullet(player)
 	pos.z = 0.3
 	local id = factory.create(BULLET_FACTORY, pos, rot, {pong = false, level = go.get_id()})
 	sprite.set_constant(id, "tint", go.get(player.."#tank1", "color")) --colors[player..TANK_SPRITE]
+end
+
+function reset_positions()
+end
+
+function reset_level()
+	reset_positions()
+	init_colors()
 end
 
 function check_input(action_id, player, prefix)
@@ -88,8 +135,14 @@ function on_input(self, action_id, action)
 	if(not action.repeated) then
 		return
 	end
-	check_input(action_id, P1, P1_CNTRL_PREFIX)
-	check_input(action_id, P2, P2_CNTRL_PREFIX)
+	if action_id == hash(MSG_START) then
+		demo = false
+		reset_level()
+	end
+	if not demo then
+		check_input(action_id, P1, P1_CNTRL_PREFIX)
+		check_input(action_id, P2, P2_CNTRL_PREFIX)
+	end
 end
 
 function update_scores(score_prefix, score)
