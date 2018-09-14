@@ -256,3 +256,63 @@ embedded_components {
     w: 1.0
   }
 }
+embedded_components {
+  id: "tank_move"
+  type: "sound"
+  data: "sound: \"/levels/sound/tank_engine.ogg\"\n"
+  "looping: 1\n"
+  "group: \"master\"\n"
+  "gain: 0.5\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "level_noise_01"
+  type: "sound"
+  data: "sound: \"/levels/sound/background_noise01.wav\"\n"
+  "looping: 1\n"
+  "group: \"master\"\n"
+  "gain: 1.0\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "level_noise_02"
+  type: "sound"
+  data: "sound: \"/levels/sound/background_noise02.wav\"\n"
+  "looping: 1\n"
+  "group: \"master\"\n"
+  "gain: 0.5\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}

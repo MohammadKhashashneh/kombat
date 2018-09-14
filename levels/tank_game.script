@@ -25,22 +25,22 @@ local COLOR_P1 = vmath.vector4(0.44, 0.44, 1, 1)
 local COLOR_P2 = vmath.vector4(0.78, 0.44, 0.76, 1)
 local COLOR_FIELD = vmath.vector4(0.37, 0.47, 0.1, 1)
 local COLOR_OBSTACLES = vmath.vector4(0.95, 0.76, 0.50, 1)
-local P1 = "/p1"					-- P1 component path
-local P2 = "/p2"					-- P2 component path
-local LEVEL = "/tank_level"			-- level component path
-local FIELD = "#field"				-- field component path
-local BORDERS = "#borders"			-- borders component path
+local P1 = "/p1"							-- P1 component path
+local P2 = "/p2"							-- P2 component path
+local LEVEL = "/tank_level"					-- level component path
+local FIELD = "#field"						-- field component path
+local BORDERS = "#borders"					-- borders component path
 --local FIELD = "field"
 --local SPRITE_P1_TANK = P1.."#tank"
 --local SPRITE_P2_TANK = P2.."#tank"
 --local SPRITE_FIELD = "#field"
--- TODO: can we define/include global variables?
-local MSG_FIRE = "fire"
-local MSG_FORWARD = "forward"
-local MSG_ROTATE = "rotate"
-local MSG_ROTATE_COUNTER = "rotate_counter"
-local MSG_START = "start"
-local MSG_IS_HIT = "is_hit"
+-- TODO: can we define/include global variables? it would be best to define below constants once
+local MSG_FIRE = "fire" 					-- A firing (bullet) message
+local MSG_FORWARD = "forward"				-- A move (player) forward message
+local MSG_ROTATE = "rotate"					-- A rotate (player) message
+local MSG_ROTATE_COUNTER = "rotate_counter"	-- A counter clockwise rotate (player) message
+local MSG_START = "start"					-- A start game message
+local MSG_IS_HIT = "is_hit"					-- A player (being) hit message
 --local MSG_SET_LEVEL = "set_level"
 local P1_CNTRL_PREFIX = "p1_"
 local P2_CNTRL_PREFIX = "p2_"
@@ -49,6 +49,8 @@ local BULLET_SPAWN_OFFSET = vmath.vector3(8, 0, 0)
 local MSG_BULLET_PLAYER_HIT = "bullet_player_hit"
 local demo = true
 local DEMO_TIMEOUT = 3
+local active_tanks = {}
+local FR = 60/10
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
@@ -61,6 +63,9 @@ function init(self)
 	self.p1_score = 0
 	self.p2_score = 0
 	self.demo_timer = DEMO_TIMEOUT
+	self.tank_move_sound = false
+	self.rate = 0
+	self.delta = 0
 end
 
 function get_random_color(base)
@@ -99,6 +104,15 @@ function update(self, dt)
 			sprite.set_constant("#p2_ones", "tint", col)
 			sprite.set_constant(BORDERS, "tint", get_random_color(COLOR_OBSTACLES))
 		end	
+	else
+		self.delta = dt
+	--[[else
+		if active_tanks[P1_CNTRL_PREFIX] then
+			check_input(self, active_tanks[P1_CNTRL_PREFIX], P1, P1_CNTRL_PREFIX)
+		end
+		if active_tanks[P2_CNTRL_PREFIX] then
+			check_input(self, active_tanks[P2_CNTRL_PREFIX], P2, P2_CNTRL_PREFIX)
+		end]]--
 	end
 end
 
@@ -116,13 +130,63 @@ end
 function reset_level()
 	reset_positions()
 	init_colors()
+	print("play01")
+	msg.post("#level_noise_02", "play_sound")
 end
 
-function check_input(action_id, player, prefix)
+function activate_tank(self, action_id, player, prefix)
+	local action
 	if action_id == hash(prefix .. MSG_FIRE) then
-		fire_bullet(player)
+		action = MSG_FIRE
+		--fire_bullet(player)
 	elseif action_id == hash(prefix .. MSG_FORWARD) then
+		--msg.post(player, MSG_FORWARD)
+		action = MSG_FORWARD
+		--if not self.tank_move_sound then
+		msg.post("#level_noise_02", "stop_sound")
+		msg.post("#tank_move", "play_sound")
+			--self.tank_move_sound = true
+		--end
+	elseif action_id == hash(prefix .. MSG_ROTATE) then
+		--msg.post(player, MSG_ROTATE)
+		action = MSG_ROTATE
+	elseif action_id == hash(prefix .. MSG_ROTATE_COUNTER) then
+		--msg.post(player, MSG_ROTATE_COUNTER)
+		action = MSG_ROTATE_COUNTER
+	end
+	--active_tanks[prefix] = hash(action)
+end
+
+function deactivate_tank(self, action_id, player, prefix)
+	if action_id == hash(prefix .. MSG_FORWARD) then
+		msg.post("#tank_move", "stop_sound")
+		print("play03 ", action_id)
+		msg.post("#level_noise_02", "play_sound")
+	end	
+	--[[if active_tanks[prefix] then
+		print("play04")
+		active_tanks[prefix] = nil
+	end]]--
+end
+
+function check_input(self, action_id, action, player, prefix)
+	-- FIXME CONTINUE 2018/08/15: Disabling below block, results in fault of handling rotations 
+	--[[print("FR ", self.rate,"/",FR,", delta is ", self.delta)
+	if self.rate < 2 then
+		self.rate = self.rate + self.delta
+		return
+	else
+		self.rate = 0
+	end]]--
+	print("ci 00", action_id, player, prefix)
+	if action_id == hash(prefix .. MSG_FIRE) and action.pressed then
+		fire_bullet(player)
+	elseif action_id == hash(prefix .. MSG_FORWARD) and action.repeated then
 		msg.post(player, MSG_FORWARD)
+		--[[if not self.tank_move_sound then
+			msg.post("#tank_move", "play_sound")
+			self.tank_move_sound = true
+		end]]--
 	elseif action_id == hash(prefix .. MSG_ROTATE) then
 		msg.post(player, MSG_ROTATE)
 	elseif action_id == hash(prefix .. MSG_ROTATE_COUNTER) then
@@ -132,23 +196,30 @@ end
 
 function on_input(self, action_id, action)
 	-- FIXME: tank movement pauses briefely
-	if(not action.repeated) then
-		return
-	end
-	if action_id == hash(MSG_START) then
+	--if(not action.repeated) then
+		--return
+	--end
+	if action_id == hash(MSG_START) and action.pressed then
 		demo = false
 		reset_level()
 	end
 	if not demo then
-		check_input(action_id, P1, P1_CNTRL_PREFIX)
-		check_input(action_id, P2, P2_CNTRL_PREFIX)
+		if action.pressed then
+			activate_tank(self, action_id, P1, P1_CNTRL_PREFIX)
+			activate_tank(self, action_id, P2, P2_CNTRL_PREFIX)
+		elseif action.released then
+			deactivate_tank(self, action_id, P1, P1_CNTRL_PREFIX)
+			deactivate_tank(self, action_id, P2, P2_CNTRL_PREFIX)
+		end	
+		check_input(self, action_id, action, P1, P1_CNTRL_PREFIX)
+		check_input(self, action_id, action, P2, P2_CNTRL_PREFIX)
 	end
 end
 
 function update_scores(score_prefix, score)
 	local tens = math.floor(score * 0.1)
 	local ones = score - (tens * 10)
-	print(tens, ones)
+	--print(tens, ones)
 	msg.post(score_prefix.."tens", "play_animation", {id = hash("num_0"..tens)})
 	msg.post(score_prefix.."ones", "play_animation", {id = hash("num_0"..ones)})
 end
