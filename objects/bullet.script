@@ -20,47 +20,58 @@
 --UT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 --SOFTWARE.
 
-local SPEED = vmath.vector3(150, 0, 0)
-local GAME_WIDTH = 223
-local GAME_HEIGHT = 176
-local BULLET_RANGE = 170
-local MSG_COLLISION_RESPONSE = "collision_response"
-local MSG_BULLET_PLAYER_HIT = "bullet_player_hit"
+-- Contants
+local SPEED = vmath.vector3(150, 0, 0)									--Bullet default speed along the X axis
+local GAME_WIDTH = 223													--FIXME: remove and make bullets die depending on each game mode
+local GAME_HEIGHT = 176													--
+local BULLET_RANGE = 140												--Maximum traveling distance before rebounding
+local MSG_COLLISION_RESPONSE = "collision_response"						--Message indicating the bullet has something
+local MSG_BULLET_DEAD = "bullet_dead"									--Message indicating when the bullet hits something and it's dead
+local MSG_MOVE_BULLET = "move_bullet"									--??
 
-go.property("pong", false)
-go.property("level", hash(""))
+-- Initializing bullet properties.
+go.property("pong", false)												--Flag indicating this bullet can rebound in pong mode
+go.property("level", hash(""))											--Id of the current leve. used to check which objects the bullet is colliding with
+go.property("tank", hash(""))											--Id of the tank firing this bullet
 
 function init(self)
 	self.spawn_pos = go.get_position()
+	self.delta = vmath.vector3()										--Delta vector used to move the bullet after being fired! The original has it.
 end
 
+-- Update bullet position along it's course
 function update(self, dt)
 	local pos = go.get_position()
-	if pos.x > GAME_WIDTH or pos.x < 0 or pos.y > GAME_HEIGHT or pos.y < 0 then
+	if vmath.length(pos - self.spawn_pos) >= BULLET_RANGE then
 		go.delete()
-	elseif vmath.length(pos - self.spawn_pos) >= BULLET_RANGE then
-		go.delete()
+		msg.post(self.tank, MSG_BULLET_DEAD, {reason = hash("DECAY")})	--Rport back to the tank
 	else
-		local pos = go.get_position() + vmath.rotate(go.get_rotation(), SPEED * dt)
+		local pos = (go.get_position() + self.delta) + vmath.rotate(go.get_rotation(), SPEED * dt)
 		go.set_position(pos)
 	end
 end
 
+-- Rebound when in pong mode
 function rebound()
 	-- TODO: implement me
 	print("booo, not implemented yet")
 end
 
+-- Respond to messages (collisions and movement)
 function on_message(self, message_id, message)
-	if message_id == hash(MSG_COLLISION_RESPONSE) then -- with bullet
-		if message.other_id ~= self.level then
-			--msg.post(self.level, MSG_BULLET_PLAYER_HIT, {player = message.other_id})
-			go.delete()
-		elseif self.pong then
+	if message_id == hash(MSG_COLLISION_RESPONSE) then 					--with bullet
+		if self.pong and message.other_id == self.level then
 			rebound()
 		else
+			r = hash("level")
 			go.delete()
-			
+			if message.other_id ~= self.level then
+				r = hash("hit")
+			end
+			msg.post(self.tank, MSG_BULLET_DEAD, {reason = r})			--Rport back to the tank
 		end
+	elseif message_id == hash(MSG_MOVE_BULLET) then						--Move the bullet based on the tank's rotation direction
+		print("bullet move: ", message.direction, self.delta)
+		self.delta = self.delta + vmath.vector3(0, 1 * message.direction, 0)
 	end
 end

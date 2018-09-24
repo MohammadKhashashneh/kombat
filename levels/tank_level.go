@@ -299,7 +299,7 @@ embedded_components {
 embedded_components {
   id: "level_noise_02"
   type: "sound"
-  data: "sound: \"/levels/sound/background_noise02.wav\"\n"
+  data: "sound: \"/levels/sound/background_noise01.wav\"\n"
   "looping: 1\n"
   "group: \"master\"\n"
   "gain: 0.5\n"
