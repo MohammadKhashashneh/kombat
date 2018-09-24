@@ -316,3 +316,43 @@ embedded_components {
     w: 1.0
   }
 }
+embedded_components {
+  id: "shoot_sound"
+  type: "sound"
+  data: "sound: \"/levels/sound/shoot_sound.wav\"\n"
+  "looping: 0\n"
+  "group: \"master\"\n"
+  "gain: 0.5\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "hit_noise"
+  type: "sound"
+  data: "sound: \"/levels/sound/hit_noise.wav\"\n"
+  "looping: 0\n"
+  "group: \"master\"\n"
+  "gain: 0.5\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}

@@ -32,11 +32,13 @@ local BORDERS = "#borders"											--Borders component path
 -- TODO: can we define/include global variables? it would be best to define below constants once
 local MSG_START = "start"											--A start game message
 local MSG_IS_HIT = "is_hit"											--A player (being) hit message
+local MSG_GAME_OVER = "game_over"									--Game over message for object cleanup
 local P1_CNTRL_PREFIX = "p1_"										--P1 input prefix, to be used for filtering p1 input commands
 local P2_CNTRL_PREFIX = "p2_"										--P2 input prefix, to be used for filtering p2 input commands
 local demo = true													--Flag indicating wer're in demo mode
 local init_seed = false												--Flag indicating we need to init the seed used to change colors in demo mode.
 local DEMO_TIMEOUT = 3												--Number of seconds to change colors in demo mode
+local GAME_TIMEOUT = 50												--Game runtime in seconds
 
 -- Initializing level and tank properties
 function init(self)
@@ -114,6 +116,17 @@ function reset_level()
 	msg.post("#level_noise_02", "play_sound")
 end
 
+function timeout(self, handle, time_elapsed)
+	msg.post("#level_noise_02", "stop_sound")
+	msg.post("#tank_move", "stop_sound")
+	msg.post(".", "acquire_input_focus")						--Release the input focus when out of demo mode
+	msg.post(P1, "release_input_focus")							--Allow input capture by both players
+	msg.post(P2, "release_input_focus")							--
+	msg.post(p1, MSG_GAME_OVER)
+	msg.post(p2, MSG_GAME_OVER)
+	demo = true
+end
+
 -- Handle level input messages (during demo mode)
 function on_input(self, action_id, action)
 	if action_id == hash(MSG_START) and action.pressed then
@@ -122,6 +135,7 @@ function on_input(self, action_id, action)
 		msg.post(".", "release_input_focus")						--Release the input focus when out of demo mode
 		msg.post(P1, "acquire_input_focus")							--Allow input capture by both players
 		msg.post(P2, "acquire_input_focus")							--
+		timer.delay(GAME_TIMEOUT, false, timeout)
 	end
 end
 

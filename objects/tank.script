@@ -45,6 +45,8 @@ local MSG_ROTATE = "rotate"												--A rotate (player) message
 local MSG_ROTATE_COUNTER = "rotate_counter"								--A counter clockwise rotate (player) message
 local MSG_IS_HIT = "is_hit"												--A player (being) hit message
 local MSG_MOVE_BULLET = "move_bullet"									--??
+local MSG_GAME_OVER	= "game_over"										--??
+
 
 -- script static variables
 local playing_sound = false												--A flag to lock playing background noise.
@@ -95,6 +97,8 @@ function update(self, dt)
 		if self.death_timer >= DEATH_ANIMATION_TIMEOUT then				--Reset the hit/death flags
 			self.hit = false
 			self.death_timer = 0
+			msg.post("/tank_level1#level_noise_02", "play_sound")
+			playing_sound = false
 		else															--Play a rotation  animation to simulate the original hit animation
 			self.next_direction = (DEATH_ROTATION_ANGLE) + self.next_direction
 			local direction = vmath.quat_rotation_z(self.next_direction)
@@ -135,10 +139,16 @@ function on_message(self, message_id, message)
 		elseif not self.hit then
 			self.hit = true												--Otherwise it's a bullet hit
 			msg.post(self.level, MSG_IS_HIT, {player = go.get_id()})	--Rport back to the level
+			msg.post("/tank_level1#hit_noise", "play_sound")
+			msg.post("/tank_level1#tank_move", "stop_sound")
+			msg.post("/tank_level1#level_noise_02", "stop_sound")
+			playing_sound = true
 		end
 	elseif message_id == hash(MSG_BULLET_DEAD) then
 		self.bullet = nil
 		print("Bullet is dead: ", message.reason)
+	elseif message_id == hash(MSG_GAME_OVER) then
+		init(self)
 	end
 end
 
@@ -154,6 +164,7 @@ function fire_bullet(self)
 		{pong = false, level = self.level, tank = go.get_id()})			--Create the game object and setup properties
 	sprite.set_constant(id, "tint", self.color)							--Set the bullet tint accordingly
 	self.bullet = id
+	msg.post("/tank_level1#shoot_sound", "play_sound")
 end
 
 -- Respond to input messages and play sound effects accordingly
